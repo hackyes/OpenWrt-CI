@@ -47,7 +47,6 @@ jobs:
           cp .config ./.config
           cat ./.config
           make defconfig
-exit
       - name: Download package source code
         run: |
           make download -j8
