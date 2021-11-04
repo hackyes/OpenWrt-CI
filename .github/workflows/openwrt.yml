@@ -31,13 +31,14 @@ jobs:
           sudo -E apt-get -yqq install git
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
-          cat .config
       - name: Download lede
         run: |
           git clone https://github.com/coolsnowwolf/lede
+          cp .config ./lede/.config
           mv ./lede/* ./
       - name: Install Helloword
         run: |
+          cat ./.config
           echo "src-git helloworld https://github.com/fw876/helloworld" >> ./feeds.conf.default 
       - name: Update feeds
         run: |
