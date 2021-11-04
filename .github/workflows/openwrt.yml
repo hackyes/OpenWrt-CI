@@ -1,10 +1,10 @@
 #
-# 每天自动编译L大的最新源码
+# 定时编译L大的最新源码
 #
 # <https://github.com/coolsnowwolf/lede> 
 #
 
-name: OPENWRT-NEWIFI3
+name: OpenWrt
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo -E apt-get -yqq update
-          sudo -E apt-get -yqq install git
+          sudo -E apt-get -yqq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
       - name: Download lede
@@ -38,7 +38,6 @@ jobs:
           mv ./lede/* ./
       - name: Install Helloword
         run: |
-          cat ./.config
           echo "src-git helloworld https://github.com/fw876/helloworld" >> ./feeds.conf.default 
       - name: Update feeds
         run: |
@@ -46,8 +45,7 @@ jobs:
           ./scripts/feeds install -a
       - name: Costom configure file
         run: |
-          cp .config ./.config
-          cat ./.config
+          sed -i '13s/5.4/5.10/g' target/linux/ramips/Makefile
           make defconfig
       - name: Download package source code
         run: |
@@ -61,5 +59,6 @@ jobs:
       - name : Upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: OpenWrt-newifi-d2
-          path: bin/targets/ramips/mt7621/openwrt-ramips-mt7621-d-team_newifi-d2-squashfs-sysupgrade.bin
+          name: OpenWrt_firmware
+          path: bin/targets/
+          
