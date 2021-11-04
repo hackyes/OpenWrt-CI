@@ -45,7 +45,6 @@ jobs:
           ./scripts/feeds install -a
       - name: Costom configure file
         run: |
-          sed -i '13s/5.4/5.10/g' target/linux/ramips/Makefile
           make defconfig
       - name: Download package source code
         run: |
