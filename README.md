@@ -1,4 +1,11 @@
-# OpenWrt-CI
-OpenWrt-CI云编译
+# OpenWrt云编译
 
-只需修改.config配置文件即可（或在本地make menuconfig 生成自己的配置，直接上传.config文件覆盖即可）
+### 克隆到自己的仓库里
+#### 打开下面链接生成.config配置文件
+#### [https://hackyes.github.io/openwrt-menuconfig/index.html](https://hackyes.github.io/openwrt-menuconfig/index.html)
+
+#### 编辑 .config 文件，把内容清空替换成上面链接生成的配置内容
+
+### 点这右上角 ✰Star  变成 ★Unstar 即可开始编译
+
+### 等待编译成功后，到Actions里下载固件即可
