@@ -1,9 +1,3 @@
-#
-# 定时编译L大的最新源码
-#
-# <https://github.com/coolsnowwolf/lede> 
-#
-
 name: OpenWrt
 
 on:
@@ -23,13 +17,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@master
-      - name: cache
-        uses: klever1988/cachewrtbuild@main
-        with:
-          ccache: false
-          toolchain: true
-          skip: true
-          clean: false
 
       - name: Initialization environment
         env:
@@ -52,7 +39,6 @@ jobs:
           ./scripts/feeds install -a
       - name: Costom configure file
         run: |
-          echo -e 'CONFIG_DEVEL=y\nCONFIG_CCACHE=y' >> .config
           make defconfig
       - name: Download package source code
         run: |
