@@ -1,0 +1,80 @@
+#
+# This is free software, lisence use MIT.
+# 
+# Copyright (C) 2019 P3TERX <https://p3terx.com>
+# Copyright (C) 2020 KFERMercer <KFER.Mercer@gmail.com>
+# 
+# <https://github.com/KFERMercer/OpenWrt-CI>
+#
+
+name: OpenWrt
+
+on:
+  push:
+    branches: 
+      - master
+  schedule:
+    - cron: 0 2 * * *
+  watch:
+    types: started
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E apt-get -yqq update
+          sudo -E apt-get -yqq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib
+          sudo -E apt-get -y autoremove --purge
+          sudo -E apt-get clean
+      - name: Download lede
+        run: |
+          git clone https://github.com/coolsnowwolf/lede
+          cp .config ./lede/.config
+          mv ./lede/* ./
+      - name: Install Helloword
+        run: |
+          echo "src-git helloworld https://github.com/fw876/helloworld" >> ./feeds.conf.default 
+      - name: Install OpenClash
+        run: |
+          mkdir package/luci-app-openclash
+          cd package/luci-app-openclash
+          git init
+          git remote add -f origin https://github.com/vernesong/OpenClash.git
+          git config core.sparsecheckout true
+          echo "luci-app-openclash" >> .git/info/sparse-checkout
+          git pull --depth 1 origin master
+          git branch --set-upstream-to=origin/master master
+          pushd luci-app-openclash/tools/po2lmo
+          make && sudo make install
+          popd
+      - name: Update feeds
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+      - name: Costom configure file
+        run: |
+          make defconfig
+      - name: Download package source code
+        run: |
+          make download -j8
+          find dl -size -1024c -exec ls -l {} \;
+          find dl -size -1024c -exec rm -f {} \;
+      - name: Compile firmware
+        run: |
+          echo -e "$(nproc) thread build."
+          make -j$(nproc) V=s
+      - name : Upload artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: OpenWrt_firmware
+          path: bin/targets/
+          
